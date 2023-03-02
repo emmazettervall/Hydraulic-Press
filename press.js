@@ -12,7 +12,7 @@ function setupSimulation() {
   const F = 2; // force applied by the press in N
   const dt = 0.01; // time step in seconds
   const r=0.4;
-  const h=1.5;
+  const h=2.0;
   
   // Define initial values
   let yCan = 0; // initial position of the object in meters
@@ -41,13 +41,11 @@ function setupSimulation() {
   const press = new THREE.Mesh(pressGeometry, pressMaterial);
   press.position.y = h+0.25; // position press above can
  
-
-  
   // Create scene and camera
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
   camera.position.z = 5;
-  camera.position.y = 2;
+  camera.position.y = 1;
   camera.lookAt(table.position);
    // Create point light source
    const light = new THREE.PointLight(0xffffff, 1, 100);
@@ -64,7 +62,8 @@ function setupSimulation() {
 
 // Instantiate a loader
 const loader = new GLTFLoader();
-let loadedModel;
+let loadedModel, bbox, abox, abs;
+
 // Load a glTF resource
 loader.load(
   // resource URL
@@ -72,18 +71,21 @@ loader.load(
   // called when the resource is loaded
   function ( gltf ) {
     
-    var bbox = new THREE.Box3().setFromObject(gltf.scene);
-    console.log(bbox);
+    bbox = new THREE.Box3().setFromObject(gltf.scene);
+    console.log("bbox, imprted model ",bbox);
+    //console.log(bbox.max.x);
     
-    gltf.scene.scale.set(r/0.9074379801750183,h/(1.6043490171432497+1.6552369594573977),r/0.9074379801750183);
-    gltf.scene.position.y=((h/2)+0.011708835726251698);
-    var abox = new THREE.Box3().setFromObject(gltf.scene);
-    console.log(abox);
+    gltf.scene.scale.set(r/bbox.max.x,h/(bbox.max.y-bbox.min.y),r/bbox.max.z);
+
+    abox = new THREE.Box3().setFromObject(gltf.scene);
+    abs=(Math.abs(-abox.min.y-abox.max.y));
+    
+    gltf.scene.position.y=((h/2)+abs/2);
+    
     loadedModel=gltf;
 
     scene.add( loadedModel.scene );
 
-    
     // Call the renderScene function after the object is loaded
     renderScene();
   },
@@ -101,9 +103,6 @@ function renderScene() {
  
   renderer.render(scene, camera);
 }
-
-  
-  
    
   // button start
   let button=false;
@@ -124,11 +123,16 @@ function renderScene() {
   document.body.appendChild(button1);
 
   let animationRunning = false; // boolean flag to check if the animation is running
-  
+  let scaleValue;
   // Add an event listener to the button to start the animation
   button.addEventListener('click', () => {
     animationRunning = true;
+    //loadedModel.scene.scale.setY(h/(1.6043490171432497+1.6552369594573977));
     
+    console.log("h: ", h);
+    console.log("yCan: ", yCan);
+    console.log("Scale values: ", loadedModel.scene.scale.x, loadedModel.scene.scale.y, loadedModel.scene.scale.z);
+    scaleValue=loadedModel.scene.scale.y;
     animate();
   });
 
@@ -175,9 +179,14 @@ function renderScene() {
     vCan = vCan + aCan * dt;
     yCan = yCan + vCan * dt;
 
-    loadedModel.scene.position.setY((h/2)+0.011708835726251698-yCan / 2);
-    loadedModel.scene.scale.setY(1 - yCan /h);
+    loadedModel.scene.position.setY((h/2)+abs/2 - yCan / 2);
+    loadedModel.scene.scale.setY(scaleValue - scaleValue*(yCan / h));
   
+    //loadedModel.scene.position.setY((h/2)+0.011708835726251698- (yCan /h) );
+    //loadedModel.scene.scale.setY(h/(1.6043490171432497+1.6552369594573977)-(yCan/(h+1.6043490171432497+1.6552369594573977)));
+
+    //gltf.scene.scale.set(r/0.9074379801750183,h/(1.6043490171432497+1.6552369594573977),r/0.9074379801750183);
+    //gltf.scene.position.y=((h/2)+0.011708835726251698);
   }
 
   // Define function to animate the scene
