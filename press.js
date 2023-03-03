@@ -127,63 +127,109 @@ container.appendChild(slider_h);
   const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000); 
   scene.background = new THREE.Color( 0xffffff );
 
-   // Create point light source
-   const light = new THREE.DirectionalLight(0xffffff, 1, 100);
-   light.position.set(1, 1, 3);
-   scene.add(light);
- 
-   // Create renderer and add to page
-   const renderer = new THREE.WebGLRenderer();
-   renderer.setSize(window.innerWidth, window.innerHeight);
-   document.body.appendChild(renderer.domElement);
+  // Create point light source
+   
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+scene.add(ambientLight);
 
-   const controls = new OrbitControls(camera, renderer.domElement);
+const spotLight = new THREE.SpotLight(0xffffff, 0.8);
+spotLight.position.set(0, 10, 10);
+spotLight.castShadow = true;
+scene.add(spotLight);
+ 
+  // Create renderer and add to page
+  const renderer = new THREE.WebGLRenderer();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
+
+  const controls = new OrbitControls(camera, renderer.domElement);
   // controls.enableDamping = true;
   // controls.dampingFactor = 0.5;
 
-   camera.position.z = 5;
-   camera.position.y = 2;
-   camera.lookAt(table.position); 
+  camera.position.z = 5;
+  camera.position.y = 2;
+  camera.lookAt(table.position); 
 
   scene.add(table);
   scene.add(press);
 
 // Instantiate a loader
 const loader = new GLTFLoader();
-let loadedModel, bbox, abox, abs, rny;
 
-// Load a glTF resource
+let numModelsLoaded = 0;
+let loadedModel, loadedPress, bbox, abox, abs;
+
+// Load the first model
 loader.load(
   // resource URL
   'can/simple_cola_can.glb',
   // called when the resource is loaded
   function ( gltf ) {
-    
+    // Manipulate the model
     bbox = new THREE.Box3().setFromObject(gltf.scene);
-       
     gltf.scene.scale.set(r/bbox.max.x,h/(bbox.max.y-bbox.min.y),r/bbox.max.z);
-
     abox = new THREE.Box3().setFromObject(gltf.scene);
     abs=(Math.abs(-abox.min.y-abox.max.y));
-    
     gltf.scene.position.y=((h/2)+abs/2);
-    
-    loadedModel=gltf;
 
+    // Add the model to the scene
+    loadedModel = gltf;
     scene.add( loadedModel.scene );
 
-    // Call the renderScene function after the object is loaded
-    renderScene();
-  },
-  // called while loading is progressing
-  function ( xhr ) {
-    console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-  },
-  // called when loading has errors
-  function ( error ) {
-    console.log( 'An error happened' );
+    // Increment the model counter
+    numModelsLoaded++;
+
+    // Call renderScene() if all the models have finished loading
+    if (numModelsLoaded === 2) {
+      renderScene();
+    }
   }
 );
+
+// Load the second model
+loader.load(
+  // resource URL
+  'press/simple_hydraulic_press.glb',
+  // called when the resource is loaded
+  function ( gltf ) {
+    loadedPress = gltf.scene;
+    scene.add( loadedPress );
+    gltf.scene.traverse( function ( child ) {
+
+      console.log( child.name );
+
+    } );
+
+    // Create empty groups for the table and the press
+    const tableGroup = new THREE.Group();
+    const pressGroup = new THREE.Group();
+
+    // Iterate over the children of the loadedPress object
+    loadedPress.children.forEach(child => {
+      // Check the name of the child and add it to the appropriate group
+      if (child.name === 'Cube') {
+        tableGroup.add(child);
+      } else if (child.name === 'Sketchfab_Scene') {
+        pressGroup.add(child);
+        console.log( "HÄR: ",child.name );
+      }
+    });
+
+    // Add the table and press groups to the scene
+    scene.add(tableGroup);
+    scene.add(pressGroup);
+
+    // Increment the model counter
+    numModelsLoaded++;
+
+    // Call renderScene() if all the models have finished loading
+    if (numModelsLoaded === 2) {
+      renderScene();
+    }
+  }
+);
+
+
 
 function renderScene() {
  
@@ -229,6 +275,7 @@ function renderScene() {
     yPress = yPress + vPress * dt;
     
     press.position.y = h+0.25 - yPress; // move press down with can
+    
 
   }
     
