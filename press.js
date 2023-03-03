@@ -35,18 +35,7 @@ document.body.appendChild(container);
   button1.style.right='30%';
   document.body.appendChild(button1);
   container.appendChild(button1);
-
-// Create a slider and add it to the container
-let slider_force = document.createElement('input');
-slider_force.type = 'range';
-slider_force.min = '0';
-slider_force.max = '20';
-slider_force.step = '0.1';
-slider_force.value = '1.5';
-slider_force.style.width = '100%';
-slider_force.style.marginBottom = '10px';
-container.appendChild(slider_force);
-
+  
 // Create a label for the slider and add it to the container
 let sliderLabel_F = document.createElement('label');
 sliderLabel_F.innerHTML = 'Force:';
@@ -56,15 +45,15 @@ sliderLabel_F.style.marginBottom = '5px';
 container.appendChild(sliderLabel_F);
 
 // Create a slider and add it to the container
-let slider_radius = document.createElement('input');
-slider_radius.type = 'range';
-slider_radius.min = '0';
-slider_radius.max = '20';
-slider_radius.step = '0.1';
-slider_radius.value = '1.5';
-slider_radius.style.width = '100%';
-slider_radius.style.marginBottom = '10px';
-container.appendChild(slider_radius);
+let slider_force = document.createElement('input');
+slider_force.type = 'number';
+slider_force.min = '0';
+slider_force.max = '20';
+slider_force.step = '0.1';
+slider_force.value = '1.5';
+slider_force.style.width = '100%';
+slider_force.style.marginBottom = '10px';
+container.appendChild(slider_force);
 
 // Create a label for the slider and add it to the container
 let sliderLabel_R = document.createElement('label');
@@ -74,14 +63,45 @@ sliderLabel_R.style.fontWeight = 'bold';
 sliderLabel_R.style.marginBottom = '5px';
 container.appendChild(sliderLabel_R);
 
+// Create a slider and add it to the container
+let slider_radius = document.createElement('input');
+slider_radius.type = 'number';
+slider_radius.min = '0';
+slider_radius.max = '5';
+slider_radius.step = '0.1';
+slider_radius.value = '0.8';
+slider_radius.style.width = '100%';
+slider_radius.style.marginBottom = '10px';
+container.appendChild(slider_radius);
+
+// Create a label for the slider and add it to the container
+let sliderLabel_h = document.createElement('label');
+sliderLabel_h.innerHTML = 'Height:';
+sliderLabel_h.style.display = 'block';
+sliderLabel_h.style.fontWeight = 'bold';
+sliderLabel_h.style.marginBottom = '5px';
+container.appendChild(sliderLabel_h);
+
+// Create a slider and add it to the container
+let slider_h = document.createElement('input');
+slider_h.type = 'number';
+slider_h.min = '0';
+slider_h.max = '20';
+slider_h.step = '0.1';
+slider_h.value = '2.5';
+slider_h.style.width = '100%';
+slider_h.style.marginBottom = '10px';
+container.appendChild(slider_h);
 
   // Define constants
-  const m = 2.53; // mass of the object in kg
+  const m = 2.53; // mass of the object in kSg
   const k = 5.71; // spring constant in N/m
-  const F = 2; // force applied by the press in N
+  //const F = 2; // force applied by the press in N
   const dt = 0.01; // time step in seconds
-  const r=0.4;
-  const h=2.0;
+  //const r=0.4;
+  //const h=2.5;
+  let r = parseFloat(slider_radius.value);
+  let h = parseFloat(slider_h.value);
   
   // Define initial values
   let yCan = 0; // initial position of the object in meters
@@ -95,13 +115,6 @@ container.appendChild(sliderLabel_R);
   const tableMaterial = new THREE.MeshPhongMaterial({ color: 0x8B4513 });
   const table = new THREE.Mesh(tableGeometry, tableMaterial);
   table.position.y = -0.05;
-
-  // Create object to be pressed (a can)
-  const geometry = new THREE.CylinderGeometry(r, r, h, 32, 1, false); // Set the last argument to true to cap the bottom
-  const material = new THREE.MeshPhongMaterial({ color: 0xff0000 });
-  const can = new THREE.Mesh(geometry, material);
-  can.position.y = h/2; // Raise the can so that it sits on the table
-  can.position.x=1;
 
   // Create press
   const pressGeometry = new THREE.BoxGeometry(2, 0.5, 2);
@@ -124,8 +137,8 @@ container.appendChild(sliderLabel_R);
    document.body.appendChild(renderer.domElement);
 
    const controls = new OrbitControls(camera, renderer.domElement);
-  //  controls.enableDamping = true;
-  //  controls.dampingFactor = 0.5;
+  // controls.enableDamping = true;
+  // controls.dampingFactor = 0.5;
 
    camera.position.z = 5;
    camera.position.y = 2;
@@ -136,7 +149,7 @@ container.appendChild(sliderLabel_R);
 
 // Instantiate a loader
 const loader = new GLTFLoader();
-let loadedModel, bbox, abox, abs;
+let loadedModel, bbox, abox, abs, rny;
 
 // Load a glTF resource
 loader.load(
@@ -146,9 +159,7 @@ loader.load(
   function ( gltf ) {
     
     bbox = new THREE.Box3().setFromObject(gltf.scene);
-    console.log("bbox, imprted model ",bbox);
-    //console.log(bbox.max.x);
-    
+       
     gltf.scene.scale.set(r/bbox.max.x,h/(bbox.max.y-bbox.min.y),r/bbox.max.z);
 
     abox = new THREE.Box3().setFromObject(gltf.scene);
@@ -176,20 +187,25 @@ loader.load(
 function renderScene() {
  
   renderer.render(scene, camera);
+ 
+  animate();
 }
+
 
   let animationRunning = false; // boolean flag to check if the animation is running
   let scaleValue;
   // Add an event listener to the button to start the animation
   button.addEventListener('click', () => {
-    animationRunning = true;
-    //loadedModel.scene.scale.setY(h/(1.6043490171432497+1.6552369594573977));
-    
-    console.log("h: ", h);
-    console.log("yCan: ", yCan);
-    console.log("Scale values: ", loadedModel.scene.scale.x, loadedModel.scene.scale.y, loadedModel.scene.scale.z);
+    animationRunning = true; 
     scaleValue=loadedModel.scene.scale.y;
-    animate();
+    // remove the button from the DOM
+  button.remove();
+  sliderLabel_F.remove();
+  slider_force.remove();
+  sliderLabel_R.remove();
+  slider_radius.remove();
+  sliderLabel_h.remove();
+  slider_h.remove();
   });
 
   // Add an event listener to the button to stop the animation
@@ -257,10 +273,19 @@ function renderScene() {
   function animate() {
     if (animationRunning) { // check if the animation is running
       updatePositionPress();
-      controls.update();
-      requestAnimationFrame(animate);
-      renderer.render(scene, camera);
     }
+    else{
+      
+      r = parseFloat(slider_radius.value);
+      h = parseFloat(slider_h.value);
+      loadedModel.scene.scale.set(r/bbox.max.x,h/(bbox.max.y-bbox.min.y),r/bbox.max.z);
+      loadedModel.scene.position.y=((h/2)+abs/2);
+      press.position.y = h+0.25 - yPress; // move press down with can
+    }
+    
+    controls.update();
+    requestAnimationFrame(animate);
+    renderer.render(scene, camera);
   }
  
 }
