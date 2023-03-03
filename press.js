@@ -117,10 +117,19 @@ container.appendChild(slider_h);
   table.position.y = -0.05;
 
   // Create press
+  const textureLoader = new THREE.TextureLoader();
+const texture = textureLoader.load('rocky_texture.jpg');
+const material = new THREE.MeshPhongMaterial({
+  map: texture,
+  color: 0x555555
+});
   const pressGeometry = new THREE.BoxGeometry(2, 0.5, 2);
-  const pressMaterial = new THREE.MeshPhongMaterial({ color: 0x87CEFA });
-  const press = new THREE.Mesh(pressGeometry, pressMaterial);
+  //const pressMaterial = new THREE.MeshPhongMaterial({ color:0x555555 });
+  const press = new THREE.Mesh(pressGeometry, material);
   press.position.y = h+0.25; // position press above can
+  const pressStångGeometry = new THREE.CylinderGeometry(0.5, 0.5, 2);
+  const stång = new THREE.Mesh(pressStångGeometry, material);
+  stång.position.y=h+1.5;
   
   // Create scene and camera
   var scene = new THREE.Scene();
@@ -128,11 +137,7 @@ container.appendChild(slider_h);
   //scene.background = new THREE.Color( 0x2a3b4c );
 
 
-  // Background texture
-  var back_loader = new THREE.TextureLoader();
-  back_loader.load('room.jpeg', function(texture) {
-    scene.background = texture;
-  });
+  
 
 
   // Create point light source
@@ -160,18 +165,14 @@ scene.add(spotLight);
 
   scene.add(table);
   scene.add(press);
-
-
-  // Garage
-
-
+  scene.add(stång);
 
 
 // Instantiate a loader
 const loader = new GLTFLoader();
 
 let numModelsLoaded = 0;
-let loadedModel, loadedPress, bbox, abox, abs;
+let loadedModel, bbox, abox, abs;
 
 // Load the first model
 loader.load(
@@ -191,57 +192,16 @@ loader.load(
     scene.add( loadedModel.scene );
 
     // Increment the model counter
-    numModelsLoaded++;
+    //numModelsLoaded++;
 
     // Call renderScene() if all the models have finished loading
-    if (numModelsLoaded === 2) {
+    //if (numModelsLoaded === 1) {
       renderScene();
-    }
+    //}
   }
 );
 
-// Load the second model
-loader.load(
-  // resource URL
-  'press/simple_hydraulic_press.glb',
-  // called when the resource is loaded
-  function ( gltf ) {
-    loadedPress = gltf.scene;
-    scene.add( loadedPress );
-    gltf.scene.traverse( function ( child ) {
 
-      console.log( child.name );
-
-    } );
-
-    // Create empty groups for the table and the press
-    const tableGroup = new THREE.Group();
-    const pressGroup = new THREE.Group();
-
-    // Iterate over the children of the loadedPress object
-    loadedPress.children.forEach(child => {
-      // Check the name of the child and add it to the appropriate group
-      if (child.name === 'Cube') {
-        tableGroup.add(child);
-      } else if (child.name === 'Sketchfab_Scene') {
-        pressGroup.add(child);
-        console.log( "HÄR: ",child.name );
-      }
-    });
-
-    // Add the table and press groups to the scene
-    scene.add(tableGroup);
-    scene.add(pressGroup);
-
-    // Increment the model counter
-    numModelsLoaded++;
-
-    // Call renderScene() if all the models have finished loading
-    if (numModelsLoaded === 2) {
-      renderScene();
-    }
-  }
-);
 
 
 
