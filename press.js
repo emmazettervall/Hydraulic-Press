@@ -123,14 +123,26 @@ container.appendChild(slider_h);
   press.position.y = h+0.25; // position press above can
   
   // Create scene and camera
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000); 
-  scene.background = new THREE.Color( 0xffffff );
+  var scene = new THREE.Scene();
+  var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000); 
+  //scene.background = new THREE.Color( 0x2a3b4c );
 
-   // Create point light source
-   const light = new THREE.DirectionalLight(0xffffff, 1, 100);
+
+  // Background texture
+  var back_loader = new THREE.TextureLoader();
+  back_loader.load('room.jpeg', function(texture) {
+    scene.background = texture;
+  });
+
+
+   // Create light source
+   const light = new THREE.PointLight(0xffffff, 1, 100);
    light.position.set(1, 1, 3);
    scene.add(light);
+
+   const amb_light = new THREE.AmbientLight(0xffffff, 1, 100);
+  //  light.position.set(1, 1, 3);
+   scene.add(amb_light);
  
    // Create renderer and add to page
    const renderer = new THREE.WebGLRenderer();
@@ -147,6 +159,12 @@ container.appendChild(slider_h);
 
   scene.add(table);
   scene.add(press);
+
+
+  // Garage
+
+
+
 
 // Instantiate a loader
 const loader = new GLTFLoader();

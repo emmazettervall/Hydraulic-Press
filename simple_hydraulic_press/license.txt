@@ -1,0 +1,11 @@
+Model Information:
+* title:	Simple Hydraulic Press
+* source:	https://sketchfab.com/3d-models/simple-hydraulic-press-85788a5f7a2048848b6038e96e25aa4b
+* author:	sashago00002 (https://sketchfab.com/sashago00002)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Simple Hydraulic Press" (https://sketchfab.com/3d-models/simple-hydraulic-press-85788a5f7a2048848b6038e96e25aa4b) by sashago00002 (https://sketchfab.com/sashago00002) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
