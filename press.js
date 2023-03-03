@@ -125,23 +125,14 @@ container.appendChild(slider_h);
   // Create scene and camera
   var scene = new THREE.Scene();
   var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000); 
-  //scene.background = new THREE.Color( 0x2a3b4c );
-
-
-  // Background texture
-  var back_loader = new THREE.TextureLoader();
-  back_loader.load('room.jpeg', function(texture) {
-    scene.background = texture;
-  });
-
+  scene.background = new THREE.Color( 0xffffff );
 
   // Create point light source
-   
   const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
 scene.add(ambientLight);
 
-const spotLight = new THREE.SpotLight(0xffffff, 0.8);
-spotLight.position.set(0, 10, 10);
+const spotLight = new THREE.PointLight(0xffffff, 0.8);
+spotLight.position.set(0, 20, 20);
 spotLight.castShadow = true;
 scene.add(spotLight);
  
@@ -161,19 +152,66 @@ scene.add(spotLight);
   scene.add(table);
   scene.add(press);
 
-
-  // Garage
-
-
-
-
 // Instantiate a loader
 const loader = new GLTFLoader();
 
 let numModelsLoaded = 0;
-let loadedModel, loadedPress, bbox, abox, abs;
+let loadedModel, loadedPress, bbox, abox, abs, loadedGarage, workBench;
 
-// Load the first model
+// Load the model of the garage
+loader.load(
+  // resource URL
+  './glb_filer/garage.glb',
+  // called when the resource is loaded
+  function ( gltf ) {
+
+    loadedGarage = gltf.scene;
+
+    // Add the model to the scene
+    loadedGarage = gltf.scene;
+    loadedGarage.scale.set(8, 8, 8); // set scale to 5 times bigger
+    loadedGarage.position.x = 8.5;
+    loadedGarage.position.y = -8;
+    loadedGarage.position.z = 8;
+    scene.add( loadedGarage );
+
+    // Increment the model counter
+    numModelsLoaded++;
+
+    // Call renderScene() if all the models have finished loading
+    if (numModelsLoaded === 2) {
+      renderScene();
+    }
+  }
+);
+
+// Load the model of the garage
+loader.load(
+  // resource URL
+  './glb_filer/bench.glb',
+  // called when the resource is loaded
+  function ( gltf ) {
+
+    // Add the model to the scene
+    workBench = gltf.scene;
+    workBench.scale.set(6, 7.5, 6); // set scale to 5 times bigger
+    workBench.position.x = 0;
+    workBench.position.y = -7;
+    workBench.position.z = 0;
+    scene.add( workBench );
+
+    // Increment the model counter
+    numModelsLoaded++;
+
+    // Call renderScene() if all the models have finished loading
+    if (numModelsLoaded === 2) {
+      renderScene();
+    }
+  }
+);
+
+
+// Load the first model - the can
 loader.load(
   // resource URL
   'can/simple_cola_can.glb',
@@ -207,7 +245,7 @@ loader.load(
   // called when the resource is loaded
   function ( gltf ) {
     loadedPress = gltf.scene;
-    scene.add( loadedPress );
+    //scene.add( loadedPress );
     gltf.scene.traverse( function ( child ) {
 
       console.log( child.name );
