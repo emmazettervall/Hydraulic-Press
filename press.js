@@ -1,7 +1,7 @@
 import * as THREE from 'https://cdn.skypack.dev/three@0.129.0/build/three.module.js';
 import { OrbitControls } from 'https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.129.0/examples/jsm/loaders/GLTFLoader.js';
-//import './panel';
+//import {test} from  './panel.js';
 
 function setupSimulation() {
 
@@ -199,13 +199,13 @@ function renderScene() {
     animationRunning = true; 
     scaleValue=loadedModel.scene.scale.y;
     // remove the button from the DOM
-  button.remove();
-  sliderLabel_F.remove();
-  slider_force.remove();
-  sliderLabel_R.remove();
-  slider_radius.remove();
-  sliderLabel_h.remove();
-  slider_h.remove();
+    button.remove();
+    sliderLabel_F.remove();
+    slider_force.remove();
+    sliderLabel_R.remove();
+    slider_radius.remove();
+    sliderLabel_h.remove();
+    slider_h.remove();
   });
 
   // Add an event listener to the button to stop the animation
@@ -214,11 +214,12 @@ function renderScene() {
   });
 
 
-  let times=true;
+  let firstTime=false;
+  let secondTime=false;
 
   // Define function to update position of object
   function updatePositionPress() {
-
+  if(secondTime!=true){
     // Read the value of the slider and use it as the force
     const F = parseFloat(slider_force.value);
 
@@ -228,12 +229,17 @@ function renderScene() {
     
     press.position.y = h+0.25 - yPress; // move press down with can
 
+  }
+    
     if(vPress<0){
-      times=false;
+      firstTime=true;
     }
 
-    if(vPress>0 && times==true){
+    if(vPress>0 && firstTime==false){
       updatePositionCan();
+    }
+    if(firstTime==true && vPress>0){
+      secondTime=true;
     }
 
     // Define bounding boxes for the can, table, and press
