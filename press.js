@@ -125,9 +125,10 @@ container.appendChild(slider_h);
   // Create scene and camera
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000); 
+  scene.background = new THREE.Color( 0xffffff );
 
    // Create point light source
-   const light = new THREE.PointLight(0xffffff, 1, 100);
+   const light = new THREE.DirectionalLight(0xffffff, 1, 100);
    light.position.set(1, 1, 3);
    scene.add(light);
  
