@@ -123,13 +123,18 @@ const material = new THREE.MeshPhongMaterial({
   map: texture,
   color: 0x555555
 });
-  const pressGeometry = new THREE.BoxGeometry(2, 0.5, 2);
-  //const pressMaterial = new THREE.MeshPhongMaterial({ color:0x555555 });
-  const press = new THREE.Mesh(pressGeometry, material);
-  press.position.y = h+0.25; // position press above can
-  const pressStångGeometry = new THREE.CylinderGeometry(0.5, 0.5, 2);
-  const stång = new THREE.Mesh(pressStångGeometry, material);
-  stång.position.y=h+1.5;
+const pressGeometry = new THREE.BoxGeometry(2, 0.5, 2);
+const press = new THREE.Mesh(pressGeometry, material);
+press.position.set(0, 0, 0);
+
+const pressStångGeometry = new THREE.CylinderGeometry(0.5, 0.5, 6);
+const stång = new THREE.Mesh(pressStångGeometry, material);
+stång.position.set(0, 3.25, 0);
+
+const group = new THREE.Object3D();
+group.add(stång);
+group.add(press);
+//group.position.y = h + 1.25;
   
   // Create scene and camera
   var scene = new THREE.Scene();
@@ -159,8 +164,9 @@ scene.add(spotLight);
   camera.lookAt(table.position); 
 
   scene.add(table);
-  scene.add(press);
-  scene.add(stång);
+ // scene.add(press);
+  //scene.add(stång);
+  scene.add(group);
 
 
 // Instantiate a loader
@@ -296,8 +302,8 @@ function renderScene() {
     vPress = vPress + aPress * dt;
     yPress = yPress + vPress * dt;
     
-    press.position.y = h+0.25 - yPress; // move press down with can
-    
+    group.position.y = h+0.25 - yPress; // move press down with can
+    //stång.position.y=h+0.5;
 
   }
     
@@ -314,7 +320,7 @@ function renderScene() {
 
     // Define bounding boxes for the can, table, and press
     const tableBoundingBox = new THREE.Box3().setFromObject(table);
-    const pressBoundingBox = new THREE.Box3().setFromObject(press);
+    const pressBoundingBox = new THREE.Box3().setFromObject(group);
 
     // Check for collisions with the press
     const pressCollision = tableBoundingBox.intersectsBox(pressBoundingBox);
@@ -356,7 +362,8 @@ function renderScene() {
       h = parseFloat(slider_h.value);
       loadedModel.scene.scale.set(r/bbox.max.x,h/(bbox.max.y-bbox.min.y),r/bbox.max.z);
       loadedModel.scene.position.y=((h/2)+abs/2);
-      press.position.y = h+0.25 - yPress; // move press down with can
+      group.position.y = h+0.25 - yPress; // move press down with can
+      //stång.position.y = h+0.25 - yPress; 
     }
     
     controls.update();
