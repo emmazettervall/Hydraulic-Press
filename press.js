@@ -110,11 +110,7 @@ container.appendChild(slider_h);
   let vPress = 0; // initial velocity of the object in m/s
 
 
-  // Create table
-  const tableGeometry = new THREE.BoxGeometry(4, 0.1, 4);
-  const tableMaterial = new THREE.MeshPhongMaterial({ color: 0x8B4513 });
-  const table = new THREE.Mesh(tableGeometry, tableMaterial);
-  table.position.y = -0.05;
+  
 
   // Create press
   const textureLoader = new THREE.TextureLoader();
@@ -135,6 +131,12 @@ const group = new THREE.Object3D();
 group.add(stång);
 group.add(press);
 //group.position.y = h + 1.25;
+
+// Create table
+const tableGeometry = new THREE.BoxGeometry(4, 0.8, 4);
+const tableMaterial = new THREE.MeshPhongMaterial({ color: 0x8B4513 });
+const table = new THREE.Mesh(tableGeometry, material);
+table.position.y = -0.4;
   
   // Create scene and camera
   var scene = new THREE.Scene();
@@ -188,7 +190,7 @@ loader.load(
     loadedGarage = gltf.scene;
     loadedGarage.scale.set(8, 8, 8); // set scale to 5 times bigger
     loadedGarage.position.x = 8.5;
-    loadedGarage.position.y = -8;
+    loadedGarage.position.y = -8.5;
     loadedGarage.position.z = 8;
     scene.add( loadedGarage );
 
@@ -213,7 +215,7 @@ loader.load(
     workBench = gltf.scene;
     workBench.scale.set(6, 7.5, 6); // set scale to 5 times bigger
     workBench.position.x = 0;
-    workBench.position.y = -7;
+    workBench.position.y = -7.5;
     workBench.position.z = 0;
     scene.add( workBench );
 
