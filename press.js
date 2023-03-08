@@ -46,7 +46,7 @@ function setupSimulation() {
   // Create a slider and add it to the container
   let slider_force = document.createElement("input");
   slider_force.type = "number";
-  slider_force.min = "0";
+  slider_force.min = "-20";
   slider_force.max = "20";
   slider_force.step = "0.1";
   slider_force.value = -0.3; //"1.5";
@@ -56,7 +56,7 @@ function setupSimulation() {
 
   // Create a label for the slider and add it to the container
   let sliderLabel_R = document.createElement("label");
-  sliderLabel_R.innerHTML = "Radius:";
+  sliderLabel_R.innerHTML = "Radius (m):";
   sliderLabel_R.style.display = "block";
   sliderLabel_R.style.fontWeight = "bold";
   sliderLabel_R.style.marginBottom = "5px";
@@ -75,7 +75,7 @@ function setupSimulation() {
 
   // Create a label for the slider and add it to the container
   let sliderLabel_h = document.createElement("label");
-  sliderLabel_h.innerHTML = "Height:";
+  sliderLabel_h.innerHTML = "Height (m):";
   sliderLabel_h.style.display = "block";
   sliderLabel_h.style.fontWeight = "bold";
   sliderLabel_h.style.marginBottom = "5px";
@@ -106,7 +106,7 @@ function setupSimulation() {
   // Define initial values
   let yCan = h; //0; // initial position of the object in meters
   let vCan = 0; // initial velocity of the object in m/s
-  let yPress = 0; // initial position of the object in meters
+  let yPress = h; // initial position of the object in meters
   let vPress = 0; // initial velocity of the object in m/s
 
   // Create press
@@ -116,13 +116,13 @@ function setupSimulation() {
     map: texture,
     color: 0x555555,
   });
-  const pressGeometry = new THREE.BoxGeometry(2, 0.5, 2);
+  const pressGeometry = new THREE.BoxGeometry(0.15, 0.05, 0.15); //(2, 0.5, 2);
   const press = new THREE.Mesh(pressGeometry, material);
   press.position.set(0, 0, 0);
 
-  const pressStångGeometry = new THREE.CylinderGeometry(0.5, 0.5, 6);
+  const pressStångGeometry = new THREE.CylinderGeometry(0.025, 0.025, 6);
   const stång = new THREE.Mesh(pressStångGeometry, material);
-  stång.position.set(0, 3.25, 0);
+  stång.position.set(0, 3.025, 0);
 
   const group = new THREE.Object3D();
   group.add(stång);
@@ -130,10 +130,10 @@ function setupSimulation() {
   //group.position.y = h + 1.25;
 
   // Create table
-  const tableGeometry = new THREE.BoxGeometry(4, 0.8, 4);
+  const tableGeometry = new THREE.BoxGeometry(0.25, 0.05, 0.25);
   const tableMaterial = new THREE.MeshPhongMaterial({ color: 0x8b4513 });
   const table = new THREE.Mesh(tableGeometry, material);
-  table.position.y = -0.4;
+  table.position.y = -0.025;
 
   // Create scene and camera
   var scene = new THREE.Scene();
@@ -163,8 +163,8 @@ function setupSimulation() {
   // controls.enableDamping = true;
   // controls.dampingFactor = 0.5;
 
-  camera.position.z = 5;
-  camera.position.y = 2;
+  camera.position.z = 0.5;
+  camera.position.y = 0.2;
   camera.lookAt(table.position);
 
   scene.add(table);
@@ -188,10 +188,10 @@ function setupSimulation() {
 
       // Add the model to the scene
       loadedGarage = gltf.scene;
-      loadedGarage.scale.set(8, 8, 8); // set scale to 5 times bigger
-      loadedGarage.position.x = 13.5;
-      loadedGarage.position.y = -8.5;
-      loadedGarage.position.z = 8;
+      loadedGarage.scale.set(0.75, 0.75, 0.75); // set scale to 5 times bigger
+      loadedGarage.position.x = 1.25;
+      loadedGarage.position.y = -0.82;
+      loadedGarage.position.z = 1.2;
       scene.add(loadedGarage);
 
       // Increment the model counter
@@ -212,9 +212,9 @@ function setupSimulation() {
     function (gltf) {
       // Add the model to the scene
       workBench = gltf.scene;
-      workBench.scale.set(6, 7.5, 6); // set scale to 5 times bigger
+      workBench.scale.set(0.65, 0.8375, 0.65); // set scale to 5 times bigger
       workBench.position.x = 0;
-      workBench.position.y = -7.5;
+      workBench.position.y = -0.809;
       workBench.position.z = 0;
       scene.add(workBench);
 
@@ -288,30 +288,36 @@ function setupSimulation() {
 
   let firstTime = false;
   let secondTime = false;
-
+  let thirdTime = false;
   // Define function to update position of object
   function updatePositionPress() {
     if (secondTime != true) {
       // Read the value of the slider and use it as the force
       const F = parseFloat(slider_force.value);
-
       //const aPress = (F - k * yPress) / m;
-      const FkP = k * (Math.abs(yPress) - h) * (yPress / Math.abs(yPress));
-      const FbP = b * vPress;
-      const aPress = (F - FkP - FbP) / m;
+      let FkP = k * (Math.abs(yPress) - h) * (yPress / Math.abs(yPress));
+      let FbP = b * vPress;
+      let aPress = (F - FkP - FbP) / m;
       vPress = vPress + aPress * dt;
       yPress = yPress + vPress * dt;
-
-      group.position.y = h + 0.25 - yPress; // move press down with can
-
-      updatePositionCan();
+      //console.log(yPress);
+      group.position.y = yPress + 0.025; // move press down with can
     }
 
-    if (vPress < 0) {
+    if (vPress > 0 && thirdTime == false) {
       firstTime = true;
+      //aPress = (F - k * yCan) / m;
+      vPress = 0.17;
+      yPress = yPress + vPress * dt;
+      group.position.y = yPress + 0.025;
+      //console.log("NEW: ", yPress);
+
+      if (group.position.y > 0.15) {
+        thirdTime = true;
+      }
     }
 
-    if (vPress > 0 && firstTime == false) {
+    if (vPress < 0 && firstTime == false) {
       updatePositionCan();
     }
     if (firstTime == true && vPress > 0) {
@@ -344,7 +350,6 @@ function setupSimulation() {
 
     vCan = vCan + aCan * dt;
     yCan = yCan + vCan * dt;
-    console.log(yCan);
 
     loadedModel.scene.position.setY(abs / 2 + yCan / 2); // h / 2 + abs / 2 - yCan / 2
     loadedModel.scene.scale.setY(scaleValue - scaleValue * ((h - yCan) / h)); //yCan) / h
@@ -370,7 +375,7 @@ function setupSimulation() {
         r / bbox.max.z
       );
       loadedModel.scene.position.y = h / 2 + abs / 2;
-      group.position.y = h + 0.25 - yPress; // move press down with can
+      group.position.y = h + 0.025; // move press down with can
       //stång.position.y = h+0.25 - yPress;
     }
 
