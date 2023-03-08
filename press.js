@@ -110,8 +110,6 @@ container.appendChild(slider_h);
   let vPress = 0; // initial velocity of the object in m/s
 
 
-  
-
   // Create press
   const textureLoader = new THREE.TextureLoader();
 const texture = textureLoader.load('rocky_texture.jpg');
@@ -189,7 +187,7 @@ loader.load(
     // Add the model to the scene
     loadedGarage = gltf.scene;
     loadedGarage.scale.set(8, 8, 8); // set scale to 5 times bigger
-    loadedGarage.position.x = 8.5;
+    loadedGarage.position.x = 13.5;
     loadedGarage.position.y = -8.5;
     loadedGarage.position.z = 8;
     scene.add( loadedGarage );
@@ -256,9 +254,6 @@ loader.load(
     //}
   }
 );
-
-
-
 
 
 function renderScene() {
