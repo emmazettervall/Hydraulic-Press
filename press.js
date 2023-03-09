@@ -1,7 +1,6 @@
 import * as THREE from "https://cdn.skypack.dev/three@0.129.0/build/three.module.js";
 import { OrbitControls } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/loaders/GLTFLoader.js";
-//import {test} from  './panel.js';
 
 function setupSimulation() {
   // Create a container for the slider and button elements
@@ -19,7 +18,6 @@ function setupSimulation() {
   let button = false;
   button = document.createElement("button");
   button.textContent = "SMASH IT!";
-  //button.style.position='absolute';
   button.style.top = "20px";
   button.style.left = "30%";
   document.body.appendChild(button);
@@ -29,7 +27,6 @@ function setupSimulation() {
   let button1 = false;
   button1 = document.createElement("button");
   button1.textContent = "STOP";
-  //button1.style.position='absolute';
   button1.style.top = "20px";
   button1.style.right = "30%";
   document.body.appendChild(button1);
@@ -37,7 +34,7 @@ function setupSimulation() {
 
   // Create a label for the slider and add it to the container
   let sliderLabel_F = document.createElement("label");
-  sliderLabel_F.innerHTML = "Force:";
+  sliderLabel_F.innerHTML = "Force (N):";
   sliderLabel_F.style.display = "block";
   sliderLabel_F.style.fontWeight = "bold";
   sliderLabel_F.style.marginBottom = "5px";
@@ -67,7 +64,7 @@ function setupSimulation() {
   slider_radius.type = "number";
   slider_radius.min = "0";
   slider_radius.max = "5";
-  slider_radius.step = "0.1";
+  slider_radius.step = "0.01";
   slider_radius.value = 0.03; //"0.8";
   slider_radius.style.width = "100%";
   slider_radius.style.marginBottom = "10px";
@@ -85,8 +82,8 @@ function setupSimulation() {
   let slider_h = document.createElement("input");
   slider_h.type = "number";
   slider_h.min = "0";
-  slider_h.max = "20";
-  slider_h.step = "0.1";
+  slider_h.max = "0.14";
+  slider_h.step = "0.01";
   slider_h.value = 0.1; //"2.5";
   slider_h.style.width = "100%";
   slider_h.style.marginBottom = "10px";
@@ -95,11 +92,8 @@ function setupSimulation() {
   // Define constants
   const m = 0.763; //2.53; // mass of the object in kSg
   const k = 3.57; //5.71; // spring constant in N/m
-  //const F = 2; // force applied by the press in N
   const dt = 0.001; // time step in seconds
   const b = 3;
-  //const r=0.4;
-  //const h=2.5;
   let r = parseFloat(slider_radius.value);
   let h = parseFloat(slider_h.value);
 
@@ -127,7 +121,6 @@ function setupSimulation() {
   const group = new THREE.Object3D();
   group.add(stång);
   group.add(press);
-  //group.position.y = h + 1.25;
 
   // Create table
   const tableGeometry = new THREE.BoxGeometry(0.25, 0.05, 0.25);
@@ -160,16 +153,12 @@ function setupSimulation() {
   document.body.appendChild(renderer.domElement);
 
   const controls = new OrbitControls(camera, renderer.domElement);
-  // controls.enableDamping = true;
-  // controls.dampingFactor = 0.5;
 
   camera.position.z = 0.5;
   camera.position.y = 0.2;
   camera.lookAt(table.position);
 
   scene.add(table);
-  // scene.add(press);
-  //scene.add(stång);
   scene.add(group);
 
   // Instantiate a loader
@@ -249,13 +238,7 @@ function setupSimulation() {
       loadedModel = gltf;
       scene.add(loadedModel.scene);
 
-      // Increment the model counter
-      //numModelsLoaded++;
-
-      // Call renderScene() if all the models have finished loading
-      //if (numModelsLoaded === 1) {
       renderScene();
-      //}
     }
   );
 
@@ -300,7 +283,7 @@ function setupSimulation() {
       let aPress = (F - FkP - FbP) / m;
       vPress = vPress + aPress * dt;
       yPress = yPress + vPress * dt;
-      //console.log(yPress);
+
       group.position.y = yPress + 0.025; // move press down with can
     }
 
@@ -310,7 +293,6 @@ function setupSimulation() {
       vPress = 0.17;
       yPress = yPress + vPress * dt;
       group.position.y = yPress + 0.025;
-      //console.log("NEW: ", yPress);
 
       if (group.position.y > 0.15) {
         thirdTime = true;
@@ -331,8 +313,6 @@ function setupSimulation() {
     // Check for collisions with the press
     const pressCollision = tableBoundingBox.intersectsBox(pressBoundingBox);
     if (pressCollision) {
-      // Move the can up to the surface of the press
-      //y = pressBoundingBox.max.y - tableBoundingBox.min.y;
       // Reverse the velocity to bounce off the press
       vPress = -vPress;
     }
@@ -353,12 +333,6 @@ function setupSimulation() {
 
     loadedModel.scene.position.setY(abs / 2 + yCan / 2); // h / 2 + abs / 2 - yCan / 2
     loadedModel.scene.scale.setY(scaleValue - scaleValue * ((h - yCan) / h)); //yCan) / h
-
-    //loadedModel.scene.position.setY((h/2)+0.011708835726251698- (yCan /h) );
-    //loadedModel.scene.scale.setY(h/(1.6043490171432497+1.6552369594573977)-(yCan/(h+1.6043490171432497+1.6552369594573977)));
-
-    //gltf.scene.scale.set(r/0.9074379801750183,h/(1.6043490171432497+1.6552369594573977),r/0.9074379801750183);
-    //gltf.scene.position.y=((h/2)+0.011708835726251698);
   }
 
   // Define function to animate the scene
@@ -369,6 +343,8 @@ function setupSimulation() {
     } else {
       r = parseFloat(slider_radius.value);
       h = parseFloat(slider_h.value);
+      yPress = h;
+      yCan = h;
       loadedModel.scene.scale.set(
         r / bbox.max.x,
         h / (bbox.max.y - bbox.min.y),
@@ -376,7 +352,6 @@ function setupSimulation() {
       );
       loadedModel.scene.position.y = h / 2 + abs / 2;
       group.position.y = h + 0.025; // move press down with can
-      //stång.position.y = h+0.25 - yPress;
     }
 
     controls.update();
